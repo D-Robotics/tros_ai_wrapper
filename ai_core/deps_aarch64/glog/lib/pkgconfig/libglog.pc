@@ -1,0 +1,10 @@
+prefix=/home/users/yifei.wang/code/glog/install_aarch64_12.2.1
+exec_prefix=/home/users/yifei.wang/code/glog/install_aarch64_12.2.1/bin
+libdir=/home/users/yifei.wang/code/glog/install_aarch64_12.2.1/lib
+includedir=/home/users/yifei.wang/code/glog/install_aarch64_12.2.1/include
+
+Name: libglog
+Description: Google Log (glog) C++ logging framework
+Version: 0.5.0
+Libs: -L${libdir} -lglog
+Cflags: -I${includedir}

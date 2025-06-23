@@ -25,10 +25,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wl,-unresolved-symbols=ignore-in-sh
 include_directories(
   ${SRC_PATH}/include/
   ${CMAKE_CURRENT_SOURCE_DIR}/include/
+  ${DEPS_ROOT}/gflags/include
+  ${DEPS_ROOT}/glog/include
 )
 
 link_directories(
   /usr/hobot/lib/
+  ${DEPS_ROOT}/gflags/lib
+  ${DEPS_ROOT}/glog/lib
 )
 
 if (DSP_ON)
