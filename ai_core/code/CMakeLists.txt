@@ -12,6 +12,8 @@ elseif(${CMAKE_SYSTEM_NAME} STREQUAL "QNX")
   add_definitions(-D_QNX_SOURCE)
 endif()
 
+find_package(OpenCV REQUIRED)
+
 message(STATUS "DEPS_ROOT: ${DEPS_ROOT}")
 message(STATUS "RELEASE_ROOT: ${RELEASE_ROOT}")
 message(STATUS "HOST_PACKAGE_DIR: ${HOST_PACKAGE_DIR}")
@@ -31,21 +33,25 @@ include_directories(
         ${DEPS_ROOT}/glog/include
         ${DEPS_ROOT}/gflags/include
         ${DEPS_ROOT}/rapidjson
-        ${DEPS_ROOT}/opencv/include
+	#${DEPS_ROOT}/opencv/include
+	#/usr/include/opencv4/opencv2/core/cvdef.h
+        /usr/include/opencv4/
+	${OpenCV_INCLUDE_DIRS}
 )
 
 link_directories(
         ${UCP_LIB}
         ${DEPS_ROOT}/glog/lib
         ${DEPS_ROOT}/gflags/lib
-        ${DEPS_ROOT}/opencv/lib
+	#${DEPS_ROOT}/opencv/lib
+        /usr/lib/aarch64-linux-gnu/
 )
 
 
 link_directories(
         /usr/hobot/lib/
-	../../../deps_aarch64/
-	../../../deps_aarch64/opencv/lib/
+	#../../../deps_aarch64/
+	#../../../deps_aarch64/opencv/lib/
         /usr/hobot/lib/
 )
 
@@ -65,8 +71,9 @@ SET(Link_libs
         dnn
         gflags
         glog
-        opencv_world
-        hbucp
+	#opencv_world
+        ${OpenCV_LIBS}
+	hbucp
         ${os_base_lib})
 
 
@@ -109,8 +116,8 @@ install(TARGETS example
 #         DESTINATION ${RELEASE_LIB_DIR})
 # install(FILES ${HOST_PACKAGE_DIR}/ucp/lib/libdnn.so
 #         DESTINATION ${RELEASE_LIB_DIR})
-install(FILES ${DEPS_ROOT}/opencv/lib/libopencv_world.so.3.4
-        DESTINATION ${RELEASE_LIB_DIR})
+#install(FILES ${DEPS_ROOT}/opencv/lib/libopencv_world.so.3.4
+#        DESTINATION ${RELEASE_LIB_DIR})
 # install(FILES ${HOST_PACKAGE_DIR}/ucp/lib/libhbrt4.so
 #         DESTINATION ${RELEASE_LIB_DIR})
 # install(FILES ${HOST_PACKAGE_DIR}/ucp/lib/libhbtl.so

@@ -18,6 +18,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <cstdint>
 
 /**
  * define a quaternion

@@ -66,7 +66,7 @@ function build_arm() {
     cd arm_build
 
     cmake -DDSP_ON=${dsp} -DCMAKE_INSTALL_PREFIX=../../s100/${type}/script ..
-    make -j8
+    make -j2
     make install
 
     cd ..
