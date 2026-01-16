@@ -59,7 +59,7 @@ function build_arm() {
     mkdir -p arm_build
     cd arm_build
 
-    cmake -DDSP_ON=${dsp} -DCMAKE_INSTALL_PREFIX=${install_prefix} ..
+    cmake -DCMAKE_INSTALL_PREFIX=${install_prefix} ..
     make -j2
     make install
 
