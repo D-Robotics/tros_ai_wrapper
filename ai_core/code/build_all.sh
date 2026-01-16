@@ -28,10 +28,7 @@ cat <<EOF
 Usage: bash -e $0 <options>
 available options:
   -p|--platform: set target platform ([s100|s600]), default is s100
-  -s|--system: set target operating system ([linux|qnx]), default is linux
   -t|--type: set type ([qat|qat]), default is qat
-  -d|--dsp: set dsp flag ([ON|OFF]), default is OFF
-  -i|--image: set build vdsp image flag ([ON|OFF]), default is OFF
   -h|--help: show this help info
 EOF
 exit
