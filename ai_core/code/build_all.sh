@@ -13,16 +13,11 @@ set -e
 # ******************** 默认配置 ********************
 platform="s100"  # 默认平台：s100/s600
 type="qat"
-dsp="OFF"
-image="OFF"
-system="linux"
 #********************
 # 差异化配置（可根据实际build_s600补充）
 declare -A PLATFORM_CONFIG=(
     ["s100:install_prefix"]="../../s100/${type}/script"
-    ["s100:dsp_path"]="../s100/qat/script/detection/centerpoint_pointpillar_nuscenes"
     ["s600:install_prefix"]="../../s600/${type}/script"
-    ["s600:dsp_path"]="../s600/qat/script/detection/centerpoint_pointpillar_nuscenes"
 )
 
 # ******************** 帮助函数 ********************
@@ -39,23 +34,6 @@ available options:
   -h|--help: show this help info
 EOF
 exit
-}
-
-
-# ******************** DSP构建（平台差异化） ********************
-function build_dsp_sample() {
-    echo "===== Build DSP Sample Image ====="
-    cd ../../../custom_operator/dsp_sample/dsp_code
-    bash build_dsp.sh -a aarch64
-    cd -
-
-    local dsp_path=${PLATFORM_CONFIG[${platform}:dsp_path]}
-    if [ ! -d "${dsp_path}/dsp_image" ]; then
-      mkdir -p ${dsp_path}/dsp_image
-    fi
-
-    cp ../../../deps_aarch64/ucp/bin/image/vdsp_image_launch.sh ${dsp_path}/dsp_image/dsp_deploy.sh
-    cp ../../../custom_operator/dsp_sample/script/image/vdsp0 ${dsp_path}/dsp_image/
 }
 
 
@@ -92,49 +70,13 @@ function build_arm() {
 }
 
 
-# ******************** QNX构建（通用逻辑+平台差异化） ********************
-function build_qnx() {
-    local DIR=$(cd "$(dirname "$0")";pwd)
-    local install_prefix=${PLATFORM_CONFIG[${platform}:install_prefix]}
-
-    # QNX环境检查
-    if [ ! $QNX_HOST ]; then
-      if [ ! -f /opt/qnx800/qnxsdp-env.sh ]; then
-        echo "Please set environment QNX_HOST correctly"
-        exit
-      else
-        source /opt/qnx800/qnxsdp-env.sh
-      fi
-    fi
-    export CC=${QNX_HOST}/usr/bin/aarch64-unknown-nto-qnx8.0.0-gcc
-    export CXX=${QNX_HOST}/usr/bin/aarch64-unknown-nto-qnx8.0.0-g++
-
-    cd ${DIR}
-    rm -rf qnx_build
-    mkdir qnx_build
-    cd qnx_build
-
-    cmake -DDSP_ON=${dsp} -DCMAKE_INSTALL_PREFIX=${install_prefix} -DCMAKE_SYSTEM_NAME=QNX ..
-
-    make install
-    make -j8
-    
-    cd ..
-    rm -rf qnx_build
-}
-
-
-
 # ******************** 参数解析 ********************
 # 定义合法参数列表
 PLATFORM_OPTS=(s100 s600)
-SYSTEM_OPTS=(linux qnx)
 TYPE_OPTS=(qat qat)
-DSP_OPTS=(ON OFF)
-IMAGE_OPTS=(ON OFF)
 
 # 解析命令行参数
-GETOPT_ARGS=`getopt -o p:s:t:d:i:h -al platform:,system:,type:,dsp:,image:,help -- "$@"`
+GETOPT_ARGS=`getopt -o p:t:h -al platform:,type:,help -- "$@"`
 eval set -- "${GETOPT_ARGS}"
 
 while [ -n "$1" ]
@@ -148,35 +90,11 @@ do
         show_usage
       fi
       ;;
-    -s|--system)
-      system=$2
-      shift 2
-      if [[ ! "${SYSTEM_OPTS[*]}" =~ $system ]] ; then
-        echo "invalid system: $system, only support ${SYSTEM_OPTS[*]}"
-        show_usage
-      fi
-      ;;
     -t|--type)
       type=$2
       shift 2
       if [[ ! "${TYPE_OPTS[*]}" =~ $type ]] ; then
         echo "invalid type: $type, only support ${TYPE_OPTS[*]}"
-        show_usage
-      fi
-      ;;
-    -d|--dsp)
-      dsp=$2
-      shift 2
-      if [[ ! "${DSP_OPTS[*]}" =~ $dsp ]] ; then
-        echo "invalid dsp opt: $dsp, only support ${DSP_OPTS[*]}"
-        show_usage
-      fi
-      ;;
-    -i|--image)
-      image=$2
-      shift 2
-      if [[ ! "${IMAGE_OPTS[*]}" =~ $image ]] ; then
-        echo "invalid image opt: $image, only support ${IMAGE_OPTS[*]}"
         show_usage
       fi
       ;;
@@ -196,19 +114,9 @@ do
 done
 
 # ******************** 主构建流程 ********************
-if [[ ${dsp} == "ON" && ${image} == "ON" ]] ; then
-    build_dsp_sample
-fi
-
-# 按系统类型选择构建逻辑
-if [[ ${system} == "linux" ]]; then
-    build_arm
-elif [[ ${system} == "qnx" ]]; then
-    build_qnx
-else
-    echo "unsupported system: ${system}"
-    show_usage
-fi
+# 移除：dsp/image相关判断逻辑、system分支判断
+# 直接执行默认的Linux ARM构建（原system=linux对应的逻辑）
+build_arm
 
 set +x
 echo "Build completed for platform: ${platform}, system: ${system}, type: ${type}"
