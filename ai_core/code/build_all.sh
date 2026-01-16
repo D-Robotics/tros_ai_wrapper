@@ -20,6 +20,7 @@ declare -A PLATFORM_CONFIG=(
     ["s600:install_prefix"]="../../s600/${type}/script"
 )
 
+
 # ******************** 帮助函数 ********************
 function show_usage() {
 cat <<EOF
