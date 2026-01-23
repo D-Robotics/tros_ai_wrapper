@@ -27,12 +27,12 @@ tar -zxvf ~/hobot_centerpoint_data.tar.gz -C ~/centerpoint_data
 ```bash
 # s100
 cd code
-bash build.sh
+bash build_all.sh -p s100
 cd -
 
 # s600
 cd code
-bash build_s600.sh
+bash build_all.sh -p s600
 cd -
 ```
 
